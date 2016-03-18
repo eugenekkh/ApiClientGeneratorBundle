@@ -1,0 +1,31 @@
+{
+    "name": "studiosite/api-client-gen-bundle",
+    "description": "Generates api client package for your REST API from NelmioApiDocBundle annotations",
+    "keywords": ["api", "client", "generator", "rest"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Evgeny Kukharik",
+            "email": "jonegkk9@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "symfony/framework-bundle": "~2.3|~3.0",
+        "symfony/console": "~2.3|~3.0",
+        "nelmio/api-doc-bundle": "~2.10|~2.11"
+    },
+    "conflict": {
+        "jms/serializer": "<0.12",
+        "jms/serializer-bundle": "<0.11",
+        "twig/twig": "<1.12"
+    },
+    "require-dev": {
+        "twig/twig": "~1.18"
+    },
+    "autoload": {
+        "psr-0": { "StudioSite\\ApiClientGeneratorBundle": "" }
+    },
+    "target-dir": "StudioSite/ApiClientGeneratorBundle"
+}

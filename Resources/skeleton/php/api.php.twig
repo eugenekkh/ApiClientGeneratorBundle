@@ -1,0 +1,128 @@
+<?php
+{% if namespace %}
+
+namespace {{namespace}};
+{% endif %}
+
+class Api
+{
+    /**
+     * @var GuzzleHttp\Client
+     */
+    protected $client;
+
+    /**
+     * @var string
+     */
+    protected $host;
+{% if auth == 'basic' %}
+
+    /**
+     * @var string
+     */
+    protected $login;
+
+    /**
+     * @var string
+     */
+    protected $password;
+{% endif %}
+
+{% if auth == 'basic' %}
+    /**
+     * @param string $host The REST API host
+     * @param string $login
+     * @param string $password
+     */
+    public function __construct($host, $login, $password)
+    {
+        $this->setHost($host);
+        $this->login = $login;
+        $this->password = $password;
+
+        $this->createClient();
+    }
+{% else %}
+    /**
+     * @param string $host The REST API host
+     */
+    public function __construct($host)
+    {
+        $this->setHost($host);
+
+        $this->createClient();
+    }
+{% endif %}
+
+    /**
+     * @param string $host
+     */
+    public function setHost($host)
+    {
+        $this->host = rtrim($host, "/");
+    }
+
+{% for method in methods %}
+
+{% include 'php/method.php.twig' %}
+{% endfor %}
+
+    protected function buildUrl($uri, $filters)
+    {
+        $url = $this->host . $uri;
+
+        if (is_array($filters))
+            $url .= '?' . http_build_query($filters);
+
+        return $url;
+    }
+
+    protected function createClient()
+    {
+        $this->client = new \GuzzleHttp\Client();
+    }
+
+    protected function request($method, $uri, $parameters = null, $filters = null)
+    {
+        $config = $this->requestConfig();
+        if (is_array($parameters))
+            $config['body'] = json_encode($parameters);
+
+        try {
+            $res = $this->client->request('GET', $this->buildUrl($uri, $filters), $config);
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            $res = $e->getResponse();
+        }
+
+        return $this->response($res);
+    }
+
+    protected function requestConfig()
+    {
+        $config = [];
+{% if auth == 'basic' %}
+        $config['auth'] = [$this->login, $this->password];
+{% endif %}
+        $config['content-type'] = 'application/json';
+        return $config;
+    }
+
+    protected function response($res)
+    {
+        $body = (string)$res->getBody();
+        $data = json_decode($body, true);
+        if (json_last_error() != JSON_ERROR_NONE) {
+            return [
+                'code' => 500,
+                'data' => null,
+                'message' => $body,
+            ];
+        }
+
+        return [
+            'code' => $res->getStatusCode(),
+            'data' => $data,
+            'message' => $res->getReasonPhrase(),
+        ];
+    }
+}

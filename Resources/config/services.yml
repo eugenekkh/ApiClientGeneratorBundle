@@ -1,0 +1,26 @@
+imports:
+    - { resource: php.yml }
+
+parameters:
+    ss_api_client_gen.nelmio_api_doc.extractor: nelmio_api_doc.extractor.api_doc_extractor
+    ss_api_client_gen.auth: null
+    ss_api_client_gen.route_prefix: null
+
+services:
+    ss_api_client_gen.conventer:
+        class: StudioSite\ApiClientGeneratorBundle\Conventer
+        arguments:
+            - "@=service(parameter('ss_api_client_gen.nelmio_api_doc.extractor'))"
+        calls:
+            - [setRoutePrefix, ["%ss_api_client_gen.route_prefix%"]]
+
+    ss_api_client_gen.template.base:
+        abstract: true
+        class: StudioSite\ApiClientGeneratorBundle\Template\Template
+        calls:
+            - [setAuth, ["%ss_api_client_gen.auth%"]]
+            - [setConventer, ["@ss_api_client_gen.conventer"]]
+            - [setFilesystem, ["@filesystem"]]
+
+    ss_api_client_gen.template_manager:
+        class: StudioSite\ApiClientGeneratorBundle\Template\TemplateManager

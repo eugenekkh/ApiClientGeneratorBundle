@@ -1,0 +1,44 @@
+{% set arguments = [] %}
+{% for argument in method.arguments %}
+{% set arguments = arguments|merge([ "$" ~ argument.name ]) %}
+{% endfor %}
+{% if method.parameters|length > 0 %}
+{% set arguments = arguments|merge([ "$parameters" ]) %}
+{% endif %}
+{% if method.filters|length > 0 %}
+{% set arguments = arguments|merge([ "$filters = null" ]) %}
+{% endif %}
+    /**
+{% for line in method.description|split("\n") %}
+     * {{line}}
+{% if loop.last %}
+     *
+{% endif %}
+{% endfor %}
+{% for argument in method.arguments %}
+     * @param {{argument.type}} ${{argument.name}} {{argument.description}}
+{% endfor %}
+{% if method.parameters|length > 0 %}
+     * @param array $parameters
+{% endif %}
+{% if method.filters|length > 0 %}
+     * @param array $filters
+{% endif %}
+     */
+    public function {{ method.name }}({{ arguments|join(', ') }})
+    {
+{% if method.deprecated %}
+        trigger_error("The method {{method.name}} deprecated", E_USER_DEPRECATED);
+
+{% endif %}
+        $uri = '{{ method.uri }}';
+{% if method.arguments|length > 0 %}
+{% for argument in method.arguments %}
+        $uri = str_replace({{"'{" ~ argument.name ~ "}'"}}, {{"$" ~ argument.name}}, $uri);
+{% endfor %}
+{% endif %}
+{% set parameters %}{% if method.parameters|length > 0 %}$parameters{% else %}null{% endif %}{% endset %}
+{% set filters %}{% if method.filters|length > 0 %}$filters{% else %}null{% endif %}{% endset %}
+
+        return $this->request('{{ method.method }}', $uri, {{parameters}}, {{filters}});
+    }

@@ -1,0 +1,16 @@
+parameters:
+    ss_api_client_gen.php.class: StudioSite\ApiClientGeneratorBundle\Template\PHP\PHPTemplate
+    ss_api_client_gen.php.config: []
+
+services:
+    ss_api_client_gen.template.php:
+        class: %ss_api_client_gen.php.class%
+        parent: ss_api_client_gen.template.base
+        public: false
+        calls:
+            - [setConfig, ["%ss_api_client_gen.php.config%"]]
+        tags:
+            -
+                name: ss_api_client_gen.template
+                alias: php
+                description: "Simple api client on the PHP language"

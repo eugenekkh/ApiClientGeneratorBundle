@@ -1,0 +1,14 @@
+{
+    "name": "{{name}}",
+    "description": "{{description}}",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5",
+        "guzzlehttp/guzzle": "6.x"
+    },
+    "autoload": {
+        "psr-0": { "{{ namespace|replace({'\\': "\\\\"}) }}": "" }
+    },
+    "target-dir": "{{ namespace|replace("\\", "/") }}"
+}
