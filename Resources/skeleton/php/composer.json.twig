@@ -8,7 +8,6 @@
         "guzzlehttp/guzzle": "6.x"
     },
     "autoload": {
-        "psr-0": { "{{ namespace|replace({'\\': "\\\\"}) }}": "" }
-    },
-    "target-dir": "{{ namespace|replace("\\", "/") }}"
+        "psr-4": { "{{ namespace|replace({'\\': "\\\\"}) }}\\": "src/" }
+    }
 }
